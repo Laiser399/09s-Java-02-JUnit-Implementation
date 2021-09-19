@@ -1,7 +1,9 @@
 package org.mai.auction;
 
 import org.junit.jupiter.api.*;
+import org.mai.auction.exceptions.DuplicateBidPriceException;
 import org.mai.auction.exceptions.InvalidBidPriceException;
+import org.mai.auction.exceptions.ProductNotFoundException;
 
 import java.math.BigDecimal;
 
@@ -60,24 +62,34 @@ public class AuctionImplTest {
         Assertions.assertThrows(ProductNotFoundException.class, () -> {
             var notExistingProductPrice = auction.getProductPrice(unknownProduct);
         });
+
+        auction.placeProduct(product3rdEdition, priceLow);
+        Assertions.assertEquals(priceLow, auction.getProductPrice(product3rdEdition));
     }
 
     @Test
-    public void addBid() {
+    public void addBid() throws DuplicateBidPriceException {
         auction.addBid(firstUserName, product3rdEdition, priceMedium);
         auction.addBid(secondUserName, product3rdEdition, priceLow);
         Assertions.assertEquals(priceMedium, auction.getProductPrice(product3rdEdition));
 
         Assertions.assertEquals(initialPrice, auction.getProductPrice(product4thEdition));
         auction.addBid(firstUserName, product4thEdition, priceBig);
-        Assertions.assertEquals(initialPrice, auction.getProductPrice(product4thEdition));
+        Assertions.assertEquals(priceBig, auction.getProductPrice(product4thEdition));
 
         Assertions.assertThrows(InvalidBidPriceException.class, () ->
                 auction.addBid(firstUserName, product3rdEdition, underInitialPrice));
+
+        Assertions.assertThrows(ProductNotFoundException.class, () ->
+                auction.addBid(firstUserName, unknownProduct, priceLow));
+
+        auction.addBid(firstUserName, product4thEdition, priceBig);
+        Assertions.assertThrows(DuplicateBidPriceException.class, () ->
+                auction.addBid(secondUserName, product4thEdition, priceBig));
     }
 
     @Test
-    public void removeBid() {
+    public void removeBid() throws DuplicateBidPriceException {
         // последующий тест покрывает логику текущего?
         Assertions.assertEquals(initialPrice, auction.getProductPrice(product3rdEdition));
         auction.addBid(firstUserName, product3rdEdition, priceLow);
@@ -95,7 +107,7 @@ public class AuctionImplTest {
     }
 
     @Test
-    public void sellProduct() {
+    public void sellProduct() throws DuplicateBidPriceException {
         var noBidsSellRes = auction.sellProduct(product3rdEdition);
         Assertions.assertFalse(noBidsSellRes);
 

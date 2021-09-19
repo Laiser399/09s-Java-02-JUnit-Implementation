@@ -1,5 +1,7 @@
 package org.mai.auction;
 
+import org.mai.auction.exceptions.DuplicateBidPriceException;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -10,7 +12,7 @@ public interface Auction {
     void placeProduct(String product, BigDecimal initialPrice);
 
     /* Покупатель user добавляет заявку на продукт со своей ценой */
-    void addBid(String user, String product, BigDecimal price);
+    void addBid(String user, String product, BigDecimal price) throws DuplicateBidPriceException;
 
     /* Покупательно может удалить заявку */
     void removeBid(String user, String product);

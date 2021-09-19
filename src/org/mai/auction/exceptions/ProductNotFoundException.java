@@ -1,4 +1,4 @@
-package org.mai.auction;
+package org.mai.auction.exceptions;
 
 public class ProductNotFoundException extends RuntimeException {
     public ProductNotFoundException(String message) {
