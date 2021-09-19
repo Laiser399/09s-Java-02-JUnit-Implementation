@@ -1,12 +1,8 @@
 package org.mai.auction;
 
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 public class AuctionImplTest {
 
@@ -16,13 +12,13 @@ public class AuctionImplTest {
     BigDecimal defaultPrice = BigDecimal.TEN;
 
     /*Вызыватется при инициализации класса AuctionImplTest*/
-    @BeforeClass
+    @BeforeAll
     public static void setupClass(){
 
     }
 
     /*Вызыватется перед вызовом каждого метода помеченного аннотацией @Test*/
-    @Before
+    @BeforeEach
     public void setup(){
         auction = new AuctionImpl();
         auction.placeProduct(product3rdEdition, defaultPrice);
@@ -30,44 +26,46 @@ public class AuctionImplTest {
     }
 
     /*Вызыватется после вызова каждого метода помеченного аннотацией @Test*/
-    @After
+    @AfterEach
     public void clear() {
         auction = null;
     }
 
     /*Вызывается после вызова всех тестовых методов*/
-    @AfterClass
-    public static void releaseRecources() {
+    @AfterAll
+    public static void releaseResources() {
 
     }
 
-    @Test(expected = ProductNotFoundException.class)
-    public void placeProduct() throws Exception {
-        List<String> products = auction.getProducts();
+    @Test()
+    public void placeProduct() {
+        var products = auction.getProducts();
 
-        assertThat(products, hasItems(product3rdEdition, product4thEdition));
+        Assertions.assertTrue(products.contains(product3rdEdition));
+        Assertions.assertTrue(products.contains(product4thEdition));
 
-        String product5thEdition = "Thinking Java 5th edition";
-        assertThat(products, not(hasItem(product5thEdition)));
+        var product5thEdition = "Thinking Java 5th edition";
+        Assertions.assertFalse(products.contains(product5thEdition));
 
-        assertEquals(auction.getProductPrice(product3rdEdition), defaultPrice);
+        Assertions.assertEquals(defaultPrice, auction.getProductPrice(product3rdEdition));
 
-        BigDecimal notExistingproductPrice = auction.getProductPrice(product5thEdition);
-    }
-
-    @Test
-    public void addBid() throws Exception {
-        assertTrue(true);
-    }
-
-    @Test
-    public void removeBid() throws Exception {
-        assertTrue(true);
+        Assertions.assertThrows(ProductNotFoundException.class, () -> {
+            var notExistingProductPrice = auction.getProductPrice(product5thEdition);
+        });
     }
 
     @Test
-    public void sellProduct() throws Exception {
-        assertTrue(true);
+    public void addBid() {
+        Assertions.fail();
     }
 
+    @Test
+    public void removeBid() {
+        Assertions.fail();
+    }
+
+    @Test
+    public void sellProduct() {
+        Assertions.fail();
+    }
 }
