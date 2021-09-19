@@ -21,12 +21,11 @@ public class Book {
         }
 
         Book book = (Book) o;
-        return id == book.id
-                && Objects.equals(title, book.title);
+        return id == book.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title);
+        return Objects.hash(id);
     }
 }
