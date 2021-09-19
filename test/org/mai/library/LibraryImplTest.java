@@ -4,7 +4,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mai.library.exceptions.BookNotBorrowedException;
 import org.mai.library.exceptions.BookUnavailableException;
+import org.mai.library.exceptions.WrongStudentException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -54,16 +56,22 @@ class LibraryImplTest {
     }
 
     @Test
-    void returnBook() {
+    void returnBook() throws WrongStudentException {
         library.borrowBook(book1, student1);
         library.returnBook(book1, student1);
         var availableBooks = library.findAvailableBooks();
         assertEquals(2, availableBooks.size());
         assertTrue(availableBooks.contains(book1));
 
-        library.returnBook(book1, student2);
+        library.borrowBook(book1, student1);
+        assertThrows(WrongStudentException.class, () ->
+                library.returnBook(book1, student2));
         library.returnBook(book1, student1);
-        library.returnBook(book1, student1);
+
+        assertThrows(BookNotBorrowedException.class, () ->
+                library.returnBook(book1, student2));
+        assertThrows(BookNotBorrowedException.class, () ->
+                library.returnBook(book1, student1));
     }
 
     @Test
