@@ -1,4 +1,4 @@
-package org.mai.dep210.collections.auction;
+package org.mai.auction;
 
 import org.junit.*;
 

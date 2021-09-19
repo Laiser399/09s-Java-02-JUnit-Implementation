@@ -1,4 +1,4 @@
-package org.mai.dep210.collections.sn;
+package org.mai.sn;
 
 import java.util.List;
 

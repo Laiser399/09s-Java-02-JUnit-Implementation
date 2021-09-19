@@ -1,4 +1,4 @@
-package org.mai.dep210.collections.library;
+package org.mai.library;
 
 public class Book {
     int id;

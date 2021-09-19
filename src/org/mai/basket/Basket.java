@@ -1,4 +1,4 @@
-package org.mai.dep210.collections.basket;
+package org.mai.basket;
 
 import java.util.List;
 

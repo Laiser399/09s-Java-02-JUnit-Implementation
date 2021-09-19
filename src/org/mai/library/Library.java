@@ -1,4 +1,4 @@
-package org.mai.dep210.collections.library;
+package org.mai.library;
 
 import java.util.List;
 
