@@ -1,9 +1,9 @@
 package org.mai.sn;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mai.sn.exceptions.UserNotRegisteredException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +15,7 @@ class SocialNetworkTest {
             "1",
             "2",
             "3",
+            "4",
             "5",
             "6",
             "7",
@@ -23,18 +24,23 @@ class SocialNetworkTest {
     @BeforeEach
     void setUp() {
         socialNetwork = new SocialNetworkImpl();
-        Assertions.fail();
+
+        addPerson();
     }
 
     @AfterEach
     void tearDown() {
-        socialNetwork.addPerson(persons[0]);
-        socialNetwork.addPerson(persons[1]);
-        socialNetwork.addPerson(persons[2]);
+        socialNetwork = null;
     }
 
     @Test
     void addPerson() {
+        socialNetwork.addPerson(persons[0]);
+        socialNetwork.addPerson(persons[1]);
+        socialNetwork.addPerson(persons[2]);
+        socialNetwork.addPerson(persons[3]);
+        socialNetwork.addPerson(persons[4]);
+
         socialNetwork.addPerson(persons[0]);
     }
 
@@ -43,6 +49,12 @@ class SocialNetworkTest {
         assertThrows(IllegalArgumentException.class, () ->
                 socialNetwork.addConnection(persons[0], persons[0]));
 
+        assertThrows(UserNotRegisteredException.class, () ->
+                socialNetwork.addConnection(persons[6], persons[0]));
+        assertThrows(UserNotRegisteredException.class, () ->
+                socialNetwork.addConnection(persons[0], persons[6]));
+
+        socialNetwork.addConnection(persons[0], persons[1]);
         socialNetwork.addConnection(persons[0], persons[1]);
         socialNetwork.addConnection(persons[1], persons[0]);
 
@@ -57,6 +69,9 @@ class SocialNetworkTest {
                 socialNetwork.getFriends(persons[0], 0));
         assertThrows(IllegalArgumentException.class, () ->
                 socialNetwork.getFriends(persons[0], -1));
+
+        assertThrows(UserNotRegisteredException.class, () ->
+                socialNetwork.getFriends(persons[6], 1));
     }
 
     @Test
