@@ -16,5 +16,5 @@ public interface SocialNetwork {
        level = 2 - непосредственные "друзья" + "друзья" "друзей"
        итд.
      */
-    List<String> getFriends(int level);
+    List<String> getFriends(String user, int level);
 }
