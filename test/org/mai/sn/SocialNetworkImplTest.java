@@ -7,7 +7,7 @@ import org.mai.sn.exceptions.UserNotRegisteredException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SocialNetworkTest {
+class SocialNetworkImplTest {
 
     private SocialNetwork socialNetwork;
 
