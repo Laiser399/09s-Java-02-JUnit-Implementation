@@ -16,4 +16,6 @@ public interface Basket {
 
     /* получить список продуктов */
     List<String> getProducts();
+
+    int getQuantity(String product);
 }
