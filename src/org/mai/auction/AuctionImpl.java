@@ -36,7 +36,7 @@ public class AuctionImpl implements Auction {
         var currentBids = bids.get(product);
 
         if (currentBids == null) {
-            currentBids = new TreeMap<>();
+            currentBids = new HashMap<>();
             currentBids.put(user, price);
             bids.put(product, currentBids);
         }
