@@ -1,13 +1,17 @@
 package org.mai.auction;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mai.auction.exceptions.DuplicateBidPriceException;
 import org.mai.auction.exceptions.InvalidBidPriceException;
 import org.mai.auction.exceptions.ProductNotFoundException;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.math.BigDecimal;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class AuctionImplTest {
     Auction auction;
@@ -42,29 +46,27 @@ public class AuctionImplTest {
     public void placeProduct() {
         var products = auction.getProducts();
 
-        Assertions.assertTrue(products.contains(product3rdEdition));
-        Assertions.assertTrue(products.contains(product4thEdition));
-        Assertions.assertFalse(products.contains(unknownProduct));
+        assertThat(products, containsInAnyOrder(product3rdEdition, product4thEdition));
 
-        Assertions.assertEquals(initialPrice, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(initialPrice));
 
         Assertions.assertThrows(ProductNotFoundException.class, () -> {
             var notExistingProductPrice = auction.getProductPrice(unknownProduct);
         });
 
         auction.placeProduct(product3rdEdition, priceLow);
-        Assertions.assertEquals(priceLow, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(priceLow));
     }
 
     @Test
     public void addBid() throws DuplicateBidPriceException {
         auction.addBid(firstUserName, product3rdEdition, priceMedium);
         auction.addBid(secondUserName, product3rdEdition, priceLow);
-        Assertions.assertEquals(priceMedium, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(priceMedium));
 
-        Assertions.assertEquals(initialPrice, auction.getProductPrice(product4thEdition));
+        assertThat(auction.getProductPrice(product4thEdition), equalTo(initialPrice));
         auction.addBid(firstUserName, product4thEdition, priceBig);
-        Assertions.assertEquals(priceBig, auction.getProductPrice(product4thEdition));
+        assertThat(auction.getProductPrice(product4thEdition), equalTo(priceBig));
 
         Assertions.assertThrows(InvalidBidPriceException.class, () ->
                 auction.addBid(firstUserName, product3rdEdition, underInitialPrice));
@@ -79,68 +81,62 @@ public class AuctionImplTest {
 
     @Test
     public void removeBid() throws DuplicateBidPriceException {
-        // последующий тест покрывает логику текущего?
-        Assertions.assertEquals(initialPrice, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(initialPrice));
         auction.addBid(firstUserName, product3rdEdition, priceLow);
-        Assertions.assertEquals(priceLow, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(priceLow));
         auction.removeBid(firstUserName, product3rdEdition);
-        Assertions.assertEquals(initialPrice, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(initialPrice));
 
-        Assertions.assertEquals(initialPrice, auction.getProductPrice(product4thEdition));
+        assertThat(auction.getProductPrice(product4thEdition), equalTo(initialPrice));
         auction.addBid(secondUserName, product4thEdition, priceMedium);
-        Assertions.assertEquals(priceMedium, auction.getProductPrice(product4thEdition));
+        assertThat(auction.getProductPrice(product4thEdition), equalTo(priceMedium));
         auction.addBid(secondUserName, product4thEdition, priceBig);
-        Assertions.assertEquals(priceBig, auction.getProductPrice(product4thEdition));
+        assertThat(auction.getProductPrice(product4thEdition), equalTo(priceBig));
         auction.removeBid(secondUserName, product4thEdition);
-        Assertions.assertEquals(initialPrice, auction.getProductPrice(product4thEdition));
+        assertThat(auction.getProductPrice(product4thEdition), equalTo(initialPrice));
     }
 
     @Test
     public void sellProduct() throws DuplicateBidPriceException {
         var noBidsSellRes = auction.sellProduct(product3rdEdition);
-        Assertions.assertFalse(noBidsSellRes);
+        assertThat(noBidsSellRes, equalTo(false));
 
         auction.addBid(firstUserName, product3rdEdition, priceLow);
 
-        Assertions.assertTrue(auction.getProducts().contains(product3rdEdition));
+        assertThat(auction.getProducts(), hasItem(product3rdEdition));
         var validSellRes = auction.sellProduct(product3rdEdition);
-        Assertions.assertTrue(validSellRes);
+        assertThat(validSellRes, equalTo(true));
 
         var invalidSellRes = auction.sellProduct(product3rdEdition);
-        Assertions.assertFalse(invalidSellRes);
-        Assertions.assertFalse(auction.getProducts().contains(product3rdEdition));
+        assertThat(invalidSellRes, equalTo(false));
+        assertThat(auction.getProducts(), not(hasItem(product3rdEdition)));
     }
 
     @Test
     public void getProducts() {
         var products = auction.getProducts();
-        assertEquals(2, products.size());
-        assertTrue(products.contains(product3rdEdition));
-        assertTrue(products.contains(product4thEdition));
+        assertThat(products, containsInAnyOrder(product3rdEdition, product4thEdition));
 
         auction.placeProduct(product5th, initialPrice);
 
         products = auction.getProducts();
-        assertEquals(3, products.size());
-        assertTrue(products.contains(product3rdEdition));
-        assertTrue(products.contains(product4thEdition));
-        assertTrue(products.contains(product5th));
+        assertThat(products, containsInAnyOrder(product3rdEdition, product4thEdition, product5th));
     }
 
     @Test
     public void getProductPrice() throws DuplicateBidPriceException {
-        assertEquals(initialPrice, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(initialPrice));
 
-        assertThrows(ProductNotFoundException.class, () ->
+        Assertions.assertThrows(ProductNotFoundException.class, () ->
                 auction.getProductPrice(unknownProduct));
 
         auction.addBid(firstUserName, product3rdEdition, priceLow);
-        assertEquals(priceLow, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(priceLow));
         auction.addBid(secondUserName, product3rdEdition, priceMedium);
-        assertEquals(priceMedium, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(priceMedium));
         auction.removeBid(firstUserName, product3rdEdition);
         auction.removeBid(secondUserName, product3rdEdition);
-        assertEquals(initialPrice, auction.getProductPrice(product3rdEdition));
+        assertThat(auction.getProductPrice(product3rdEdition), equalTo(initialPrice));
     }
 
     private void placeCommonProducts() {
